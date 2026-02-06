@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Annotated
 
 import networkx as nx
 import numpy as np
@@ -22,11 +22,11 @@ console = Console()
 app = typer.Typer(help="Infra Resilience Explorer")
 
 
-def _tree_signature(tree: Tree) -> Tuple[Tuple[str, str], ...]:
+def _tree_signature(tree: Tree) -> tuple[tuple[str, str], ...]:
     return tuple(sorted(io.edge_key(u, v) for u, v in tree.edges()))
 
 
-def _tree_to_record(tree: Tree, count: int, total: int) -> Dict[str, object]:
+def _tree_to_record(tree: Tree, count: int, total: int) -> dict[str, object]:
     return {
         "root": tree.root,
         "edges": [(u, v) for u, v in tree.edges()],
@@ -35,10 +35,10 @@ def _tree_to_record(tree: Tree, count: int, total: int) -> Dict[str, object]:
     }
 
 
-def _record_to_tree(record: Dict[str, object], nodes: List[str]) -> Tree:
+def _record_to_tree(record: dict[str, object], nodes: list[str]) -> Tree:
     root = record["root"]  # type: ignore[index]
     edges = record["edges"]  # type: ignore[index]
-    parent: Dict[str, str | None] = {root: None}
+    parent: dict[str, str | None] = {root: None}
     for u, v in edges:  # type: ignore[misc]
         parent[v] = u
     for node in nodes:
@@ -53,7 +53,7 @@ def run_mwu(
     eta: float,
     alpha: float,
     seed: int,
-) -> tuple[List[Dict[str, object]], Dict[Tuple[str, str], float]]:
+) -> tuple[list[dict[str, object]], dict[tuple[str, str], float]]:
     """Run the multiplicative-weights update loop and return (mixture, expected_cong)."""
 
     rng = np.random.default_rng(seed)
@@ -62,7 +62,7 @@ def run_mwu(
     weights = {edge: 1.0 for edge in capacities}
     expected_cong = {edge: 0.0 for edge in capacities}
 
-    mixture_counts: Dict[Tuple[Tuple[str, str], ...], Dict[str, object]] = {}
+    mixture_counts: dict[tuple[tuple[str, str], ...], dict[str, object]] = {}
 
     for _ in track(range(iters), description="Running MWU"):
         total_w = sum(weights.values())
@@ -105,11 +105,14 @@ def write_json(path: Path, payload: dict) -> None:
 
 @app.command()
 def fit(
-    graph: Path = typer.Option(..., exists=True, help="Path to undirected weighted edge list"),
-    iters: int = typer.Option(80, help="Number of MWU iterations"),
-    candidates: int = typer.Option(8, help="Candidate trees per iteration"),
-    seed: int = typer.Option(0, help="Random seed"),
-    out: Path = typer.Option(Path("outputs"), help="Output directory"),
+    graph: Annotated[
+        Path,
+        typer.Option(..., exists=True, help="Path to undirected weighted edge list"),
+    ],
+    iters: Annotated[int, typer.Option(help="Number of MWU iterations")] = 80,
+    candidates: Annotated[int, typer.Option(help="Candidate trees per iteration")] = 8,
+    seed: Annotated[int, typer.Option(help="Random seed")] = 0,
+    out: Annotated[Path, typer.Option(help="Output directory")] = Path("outputs"),
 ) -> None:
     """Fit a tree mixture and emit mixture.json and report.json."""
 
@@ -132,7 +135,7 @@ def fit(
     }
     write_json(out / "mixture.json", mixture_payload)
 
-    all_cuts: List[Dict[str, object]] = []
+    all_cuts: list[dict[str, object]] = []
     for rec in mixture:
         tree = _record_to_tree(rec, list(g.nodes))
         all_cuts.extend(cuts.extract_tree_cuts(g, tree))
@@ -150,9 +153,9 @@ def fit(
 
 @app.command("report")
 def report_cmd(
-    graph: Path = typer.Option(..., exists=True, help="Path to graph edge list"),
-    mixture: Path = typer.Option(..., exists=True, help="Path to mixture.json"),
-    out: Path = typer.Option(Path("outputs"), help="Output directory"),
+    graph: Annotated[Path, typer.Option(..., exists=True, help="Path to graph edge list")],
+    mixture: Annotated[Path, typer.Option(..., exists=True, help="Path to mixture.json")],
+    out: Annotated[Path, typer.Option(help="Output directory")] = Path("outputs"),
 ) -> None:
     """Recompute report.json from a stored mixture."""
 
@@ -162,7 +165,7 @@ def report_cmd(
     total_samples = sum(int(t["count"]) for t in mixture_records)
 
     expected_cong = {io.edge_key(u, v): 0.0 for u, v, _ in io.iter_edges(g)}
-    all_cuts: List[Dict[str, object]] = []
+    all_cuts: list[dict[str, object]] = []
     for rec in mixture_records:
         tree = _record_to_tree(rec, list(g.nodes))
         lca = LCA(tree)

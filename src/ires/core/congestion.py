@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Dict, Tuple
-
 import networkx as nx
 
 from . import io
@@ -11,7 +9,7 @@ from .lca import LCA
 from .tree import Tree
 
 
-def compute_tree_capacities(graph: nx.Graph, tree: Tree, lca: LCA) -> Dict[Tuple[str, str], float]:
+def compute_tree_capacities(graph: nx.Graph, tree: Tree, lca: LCA) -> dict[tuple[str, str], float]:
     """Compute induced capacities c_T for each tree edge using the LCA trick."""
 
     add = {node: 0.0 for node in tree.nodes}
@@ -22,7 +20,7 @@ def compute_tree_capacities(graph: nx.Graph, tree: Tree, lca: LCA) -> Dict[Tuple
         add[ancestor] -= 2 * w
 
     total = dict(add)
-    c_t: Dict[Tuple[str, str], float] = {}
+    c_t: dict[tuple[str, str], float] = {}
     for node in reversed(tree.bfs_order):
         parent = tree.parent[node]
         if parent is not None:
@@ -32,12 +30,12 @@ def compute_tree_capacities(graph: nx.Graph, tree: Tree, lca: LCA) -> Dict[Tuple
 
 
 def compute_edge_congestion(
-    graph: nx.Graph, tree: Tree, lca: LCA, c_t: Dict[Tuple[str, str], float]
-) -> Dict[Tuple[str, str], float]:
+    graph: nx.Graph, tree: Tree, lca: LCA, c_t: dict[tuple[str, str], float]
+) -> dict[tuple[str, str], float]:
     """Compute cong_T(e) for each original edge."""
 
     lca.set_edge_weights(c_t)
-    congestions: Dict[Tuple[str, str], float] = {}
+    congestions: dict[tuple[str, str], float] = {}
     for u, v, capacity in io.iter_edges(graph):
         key = io.edge_key(u, v)
         if capacity <= 0:

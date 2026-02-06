@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List, Set, Tuple
-
 import networkx as nx
 
 from . import io
 from .tree import Tree
 
 
-def cut_capacity(graph: nx.Graph, subset: Set[str]) -> float:
+def cut_capacity(graph: nx.Graph, subset: set[str]) -> float:
     """Exact capacity of the cut (subset, complement)."""
 
     total = 0.0
@@ -22,11 +20,11 @@ def cut_capacity(graph: nx.Graph, subset: Set[str]) -> float:
 
 def extract_tree_cuts(
     graph: nx.Graph, tree: Tree, top_k: int | None = None
-) -> List[Dict[str, object]]:
+) -> list[dict[str, object]]:
     """Return candidate cuts induced by each tree edge, sorted by capacity."""
 
-    cuts: List[Dict[str, object]] = []
-    subtree_cache: Dict[str, List[str]] = {}
+    cuts: list[dict[str, object]] = []
+    subtree_cache: dict[str, list[str]] = {}
     for parent, child in tree.edges():
         if child not in subtree_cache:
             subtree_cache[child] = tree.subtree_nodes(child)

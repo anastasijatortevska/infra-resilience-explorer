@@ -3,25 +3,24 @@
 from __future__ import annotations
 
 from collections import defaultdict, deque
-from typing import Dict, Iterable, List
 
 
 class Tree:
     """Represents a rooted tree with parent/child relationships."""
 
-    def __init__(self, root: str, parent: Dict[str, str | None]):
+    def __init__(self, root: str, parent: dict[str, str | None]):
         if root not in parent:
             raise ValueError("root must be present in parent map")
         self.root = root
         self.parent = dict(parent)
 
-        self.children: Dict[str, List[str]] = defaultdict(list)
+        self.children: dict[str, list[str]] = defaultdict(list)
         for node, par in self.parent.items():
             if par is not None:
                 self.children[par].append(node)
 
-        self.depth: Dict[str, int] = {}
-        self._bfs_order: List[str] = []
+        self.depth: dict[str, int] = {}
+        self._bfs_order: list[str] = []
         queue: deque[str] = deque([root])
         self.depth[root] = 0
         while queue:
@@ -36,19 +35,19 @@ class Tree:
             raise ValueError(f"Parent map does not form a connected tree: {missing_depth}")
 
     @property
-    def nodes(self) -> List[str]:
+    def nodes(self) -> list[str]:
         return list(self.parent.keys())
 
     @property
-    def bfs_order(self) -> List[str]:
+    def bfs_order(self) -> list[str]:
         return list(self._bfs_order)
 
     @property
-    def postorder(self) -> List[str]:
+    def postorder(self) -> list[str]:
         """Return nodes in postorder (children before parent)."""
 
-        order: List[str] = []
-        stack: List[tuple[str, int]] = [(self.root, 0)]
+        order: list[str] = []
+        stack: list[tuple[str, int]] = [(self.root, 0)]
         while stack:
             node, state = stack.pop()
             if state == 0:
@@ -59,15 +58,15 @@ class Tree:
                 order.append(node)
         return order
 
-    def edges(self) -> List[tuple[str, str]]:
+    def edges(self) -> list[tuple[str, str]]:
         """List oriented edges (parent, child)."""
 
         return [(par, node) for node, par in self.parent.items() if par is not None]
 
-    def subtree_nodes(self, node: str) -> List[str]:
+    def subtree_nodes(self, node: str) -> list[str]:
         """Return all nodes in the subtree rooted at ``node``."""
 
-        out: List[str] = []
+        out: list[str] = []
         stack = [node]
         while stack:
             u = stack.pop()
@@ -76,5 +75,5 @@ class Tree:
         return out
 
     @classmethod
-    def from_parent_map(cls, root: str, parents: Dict[str, str | None]) -> "Tree":
+    def from_parent_map(cls, root: str, parents: dict[str, str | None]) -> Tree:
         return cls(root=root, parent=parents)
