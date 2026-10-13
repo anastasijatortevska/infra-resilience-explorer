@@ -1,9 +1,15 @@
 Infra Resilience Explorer
 =========================
 
-This tool learns a mixture of spanning trees that highlight weak points in an undirected, capacitated network. It reports:
-- **Critical edges**: original edges with high expected congestion when traffic is routed along the learned tree mixture.
-- **Bottleneck cuts**: node partitions induced by tree edges whose removal disconnects a sparse part of the graph.
+This small Python experiment samples spanning-tree mixtures on undirected,
+capacitated graphs. It reports a heuristic **cut-path score** for original edges
+and the capacities of candidate fundamental cuts. These are not traffic
+congestion or validated infrastructure criticality measures.
+
+The exact definitions, a hand-checkable example, and the relationship to the
+iterative update are in [the mathematical contract](docs/mathematics.md).
+There is no approximation guarantee; the historical alpha formula is a tuning
+default, not a proven bound.
 
 Quick start
 -----------
@@ -31,4 +37,4 @@ Each line contains `u v w` (nodes are strings, `w` is a float capacity). Paralle
 Outputs
 -------
 - `mixture.json`: the sampled trees and their probabilities.
-- `report.json`: summary with critical edges and top bottleneck cuts (node lists are truncated to 30 for readability).
+- `report.json`: maximum expected cut-path score, high-scoring edges, and low-capacity candidate cuts (node lists are truncated to 30 for readability).

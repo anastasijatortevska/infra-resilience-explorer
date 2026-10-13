@@ -7,10 +7,10 @@ import networkx as nx
 from . import io
 
 
-def critical_edges(
-    graph: nx.Graph, expected_cong: dict[tuple[str, str], float], top_k: int = 10
+def scored_edges(
+    graph: nx.Graph, expected_scores: dict[tuple[str, str], float], top_k: int = 10
 ) -> list[dict[str, object]]:
-    """Return top-k edges by expected congestion."""
+    """Return top-k edges by expected cut-path score (a heuristic)."""
 
     records: list[dict[str, object]] = []
     for u, v, capacity in io.iter_edges(graph):
@@ -19,17 +19,17 @@ def critical_edges(
             {
                 "edge": (u, v),
                 "capacity": capacity,
-                "expected_congestion": expected_cong.get(key, 0.0),
+                "expected_cut_path_score": expected_scores[key],
             }
         )
-    records.sort(key=lambda r: r["expected_congestion"], reverse=True)  # type: ignore[index]
+    records.sort(key=lambda r: r["expected_cut_path_score"], reverse=True)  # type: ignore[index]
     return records[:top_k]
 
 
 def assemble_report(
     graph: nx.Graph,
     mixture: list[dict[str, object]],
-    expected_cong: dict[tuple[str, str], float],
+    expected_scores: dict[tuple[str, str], float],
     cuts: list[dict[str, object]],
     params: dict[str, object],
     top_k_edges: int = 10,
@@ -55,11 +55,13 @@ def assemble_report(
             "edges": graph.number_of_edges(),
         },
         "parameters": params,
+        "metric": "cut_path_score",
+        "max_expected_cut_path_score": max(expected_scores.values()),
         "mixture": {
             "unique_trees": len(mixture),
             "total_samples": sum(int(t["count"]) for t in mixture),
             "trees": mixture,
         },
-        "critical_edges": critical_edges(graph, expected_cong, top_k_edges),
-        "bottleneck_cuts": cut_entries,
+        "scored_edges": scored_edges(graph, expected_scores, top_k_edges),
+        "candidate_cuts": cut_entries,
     }

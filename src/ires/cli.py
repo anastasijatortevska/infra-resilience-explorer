@@ -13,7 +13,7 @@ import typer
 from rich.console import Console
 from rich.progress import track
 
-from .core import congestion, cuts, io, report
+from .core import cuts, io, metrics, report
 from .core.lca import LCA
 from .core.tree import Tree
 from .oracles.spt import shortest_path_tree
@@ -54,13 +54,18 @@ def run_mwu(
     alpha: float,
     seed: int,
 ) -> tuple[list[dict[str, object]], dict[tuple[str, str], float]]:
-    """Run the multiplicative-weights update loop and return (mixture, expected_cong)."""
+    """Experimentally minimize the maximum expected cut-path score.
+
+    Candidates minimize the current weighted score; the positive update raises
+    the next iteration's attention to high-scoring edges. The SPT candidate
+    generator is a heuristic, and alpha is only an update scale.
+    """
 
     rng = np.random.default_rng(seed)
     nodes = list(graph.nodes)
     capacities = {io.edge_key(u, v): w for u, v, w in io.iter_edges(graph)}
     weights = {edge: 1.0 for edge in capacities}
-    expected_cong = {edge: 0.0 for edge in capacities}
+    expected_scores = {edge: 0.0 for edge in capacities}
 
     mixture_counts: dict[tuple[tuple[str, str], ...], dict[str, object]] = {}
 
@@ -74,16 +79,16 @@ def run_mwu(
             root = rng.choice(nodes)
             tree = shortest_path_tree(graph, lengths, root)
             lca = LCA(tree)
-            c_t = congestion.compute_tree_capacities(graph, tree, lca)
-            cong = congestion.compute_edge_congestion(graph, tree, lca, c_t)
-            obj = sum(probs[e] * cong[e] for e in cong)
-            candidates.append((obj, tree, cong))
+            c_t = metrics.compute_tree_capacities(graph, tree, lca)
+            scores = metrics.compute_edge_scores(graph, tree, lca, c_t)
+            obj = sum(probs[e] * scores[e] for e in scores)
+            candidates.append((obj, tree, scores))
 
-        obj, tree, cong = min(candidates, key=lambda x: x[0])
+        obj, tree, scores = min(candidates, key=lambda x: x[0])
 
-        for edge, val in cong.items():
+        for edge, val in scores.items():
             weights[edge] *= math.exp(eta * (val / alpha - 1))
-            expected_cong[edge] += val / iters
+            expected_scores[edge] += val / iters
 
         sig = _tree_signature(tree)
         if sig not in mixture_counts:
@@ -95,7 +100,7 @@ def run_mwu(
         for info in mixture_counts.values()
     ]
     mixture.sort(key=lambda rec: rec["count"], reverse=True)  # type: ignore[index]
-    return mixture, expected_cong
+    return mixture, expected_scores
 
 
 def write_json(path: Path, payload: dict) -> None:
@@ -117,13 +122,16 @@ def fit(
     """Fit a tree mixture and emit mixture.json and report.json."""
 
     g = io.load_graph(graph)
+    # Historical tuning default; no bound or approximation guarantee is implied.
     alpha = 10 * math.log2(g.number_of_nodes() + 1)
     console.print(
         f"[bold]Graph[/]: {g.number_of_nodes()} nodes, {g.number_of_edges()} edges. "
         f"alpha={alpha:.2f}"
     )
 
-    mixture, expected_cong = run_mwu(g, iters=iters, r=candidates, eta=0.6, alpha=alpha, seed=seed)
+    mixture, expected_scores = run_mwu(
+        g, iters=iters, r=candidates, eta=0.6, alpha=alpha, seed=seed
+    )
 
     mixture_payload = {
         "graph": graph.as_posix(),
@@ -143,12 +151,12 @@ def fit(
     rpt = report.assemble_report(
         g,
         mixture,
-        expected_cong,
+        expected_scores,
         cuts=all_cuts,
         params={"iters": iters, "candidates": candidates, "seed": seed, "alpha": alpha},
     )
     write_json(out / "report.json", rpt)
-    console.print(f"[green]Wrote[/] {out/'mixture.json'} and {out/'report.json'}")
+    console.print(f"[green]Wrote[/] {out / 'mixture.json'} and {out / 'report.json'}")
 
 
 @app.command("report")
@@ -164,22 +172,22 @@ def report_cmd(
     mixture_records = payload["trees"]
     total_samples = sum(int(t["count"]) for t in mixture_records)
 
-    expected_cong = {io.edge_key(u, v): 0.0 for u, v, _ in io.iter_edges(g)}
+    expected_scores = {io.edge_key(u, v): 0.0 for u, v, _ in io.iter_edges(g)}
     all_cuts: list[dict[str, object]] = []
     for rec in mixture_records:
         tree = _record_to_tree(rec, list(g.nodes))
         lca = LCA(tree)
-        c_t = congestion.compute_tree_capacities(g, tree, lca)
-        cong = congestion.compute_edge_congestion(g, tree, lca, c_t)
+        c_t = metrics.compute_tree_capacities(g, tree, lca)
+        scores = metrics.compute_edge_scores(g, tree, lca, c_t)
         weight = rec["count"] / total_samples  # type: ignore[index]
-        for edge, val in cong.items():
-            expected_cong[edge] += weight * val
+        for edge, val in scores.items():
+            expected_scores[edge] += weight * val
         all_cuts.extend(cuts.extract_tree_cuts(g, tree))
 
     rpt = report.assemble_report(
         g,
         mixture_records,
-        expected_cong,
+        expected_scores,
         cuts=all_cuts,
         params={
             "iters": payload.get("iters"),
@@ -189,7 +197,7 @@ def report_cmd(
         },
     )
     write_json(out / "report.json", rpt)
-    console.print(f"[green]Wrote[/] {out/'report.json'}")
+    console.print(f"[green]Wrote[/] {out / 'report.json'}")
 
 
 if __name__ == "__main__":

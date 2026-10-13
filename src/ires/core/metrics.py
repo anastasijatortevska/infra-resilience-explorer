@@ -1,4 +1,4 @@
-"""Capacities and congestion computations on trees."""
+"""Fundamental-cut capacities and the experimental cut-path score."""
 
 from __future__ import annotations
 
@@ -10,7 +10,11 @@ from .tree import Tree
 
 
 def compute_tree_capacities(graph: nx.Graph, tree: Tree, lca: LCA) -> dict[tuple[str, str], float]:
-    """Compute induced capacities c_T for each tree edge using the LCA trick."""
+    """Sum original capacities crossing each tree edge's fundamental cut.
+
+    Equivalently, route demand c(u,v) on the tree path for every original edge:
+    this is the resulting load on each tree edge, before dividing by a capacity.
+    """
 
     add = {node: 0.0 for node in tree.nodes}
     for u, v, w in io.iter_edges(graph):
@@ -29,18 +33,22 @@ def compute_tree_capacities(graph: nx.Graph, tree: Tree, lca: LCA) -> dict[tuple
     return c_t
 
 
-def compute_edge_congestion(
+def compute_edge_scores(
     graph: nx.Graph, tree: Tree, lca: LCA, c_t: dict[tuple[str, str], float]
 ) -> dict[tuple[str, str], float]:
-    """Compute cong_T(e) for each original edge."""
+    """Return s_T(u,v) = sum(c_T(f) for f in path_T(u,v)) / c(u,v).
+
+    This is a dimensionless heuristic, not routing congestion on (u,v).
+    See docs/mathematics.md for definitions and a routing counterexample.
+    """
 
     lca.set_edge_weights(c_t)
-    congestions: dict[tuple[str, str], float] = {}
+    scores: dict[tuple[str, str], float] = {}
     for u, v, capacity in io.iter_edges(graph):
         key = io.edge_key(u, v)
         if capacity <= 0:
-            congestions[key] = float("inf")
+            scores[key] = float("inf")
             continue
         dist = lca.dist(u, v)
-        congestions[key] = dist / capacity
-    return congestions
+        scores[key] = dist / capacity
+    return scores
