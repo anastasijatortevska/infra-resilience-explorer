@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from collections import defaultdict, deque
 
+import networkx as nx
+
 
 class Tree:
     """Represents a rooted tree with parent/child relationships."""
@@ -11,8 +13,15 @@ class Tree:
     def __init__(self, root: str, parent: dict[str, str | None]):
         if root not in parent:
             raise ValueError("root must be present in parent map")
+        if parent[root] is not None:
+            raise ValueError("root must have no parent")
+        for node, par in parent.items():
+            if not isinstance(node, str):
+                raise ValueError("Tree node identifiers must be strings")
+            if node != root and (par not in parent or par == node):
+                raise ValueError(f"Node {node} must have a different parent in the tree")
         self.root = root
-        self.parent = dict(parent)
+        self.parent = dict(sorted(parent.items()))
 
         self.children: dict[str, list[str]] = defaultdict(list)
         for node, par in self.parent.items():
@@ -33,6 +42,15 @@ class Tree:
         missing_depth = [n for n in self.parent if n not in self.depth]
         if missing_depth:
             raise ValueError(f"Parent map does not form a connected tree: {missing_depth}")
+
+    def validate_against(self, graph: nx.Graph) -> None:
+        """Require exact coverage and real graph edges for a spanning tree."""
+
+        if set(self.nodes) != set(graph.nodes):
+            raise ValueError("Tree nodes must exactly cover the graph")
+        for edge in self.edges():
+            if not graph.has_edge(*edge):
+                raise ValueError(f"Tree edge {edge} is not an edge of the graph")
 
     @property
     def nodes(self) -> list[str]:

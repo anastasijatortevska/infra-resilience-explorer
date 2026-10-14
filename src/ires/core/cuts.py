@@ -37,5 +37,33 @@ def extract_tree_cuts(
                 "nodes": nodes,
             }
         )
-    cuts.sort(key=lambda x: x["capacity"])  # type: ignore[index]
-    return cuts[:top_k] if top_k is not None else cuts
+    return rank_cuts(graph, cuts, top_k)
+
+
+def rank_cuts(
+    graph: nx.Graph, candidates: list[dict[str, object]], top_k: int | None = None
+) -> list[dict[str, object]]:
+    """Globally rank unique partitions by capacity, then size/labels/edge.
+
+    Choose the smaller side; for equally sized sides choose lexicographically.
+    The inducing edge is only provenance, not the cut's identity.
+    """
+
+    if top_k is not None:
+        io.positive_count(top_k, "top_k")
+    records: dict[tuple[str, ...], dict[str, object]] = {}
+    for candidate in candidates:
+        subset = set(candidate["nodes"])
+        if not subset or not subset < set(graph):
+            raise ValueError("Candidate cut must be a nonempty proper subset of graph vertices")
+        sides = (tuple(sorted(subset)), tuple(sorted(set(graph) - subset)))
+        partition = min(sides, key=lambda side: (len(side), side))
+        edge = io.edge_key(*candidate["edge"])
+        record = {"edge": edge, "capacity": candidate["capacity"], "nodes": list(partition)}
+        if partition not in records or edge < records[partition]["edge"]:
+            records[partition] = record
+    ranked = sorted(
+        records.values(),
+        key=lambda rec: (rec["capacity"], len(rec["nodes"]), tuple(rec["nodes"]), rec["edge"]),
+    )
+    return ranked[:top_k] if top_k is not None else ranked

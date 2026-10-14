@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+from functools import wraps
 from pathlib import Path
 from typing import Annotated
 
@@ -13,7 +14,8 @@ import typer
 from rich.console import Console
 from rich.progress import track
 
-from .core import cuts, io, metrics, report
+from .core import io, metrics, report
+from .core import mixture as mix_utils
 from .core.lca import LCA
 from .core.tree import Tree
 from .oracles.spt import shortest_path_tree
@@ -22,8 +24,18 @@ console = Console()
 app = typer.Typer(help="Infra Resilience Explorer")
 
 
-def _tree_signature(tree: Tree) -> tuple[tuple[str, str], ...]:
-    return tuple(sorted(io.edge_key(u, v) for u, v in tree.edges()))
+def _input_errors(command):
+    """Turn invalid user input into a short CLI error and nonzero exit."""
+
+    @wraps(command)
+    def checked(*args, **kwargs):
+        try:
+            return command(*args, **kwargs)
+        except (ValueError, OSError, OverflowError) as exc:
+            console.print(f"Error: {exc}", markup=False)
+            raise typer.Exit(code=2) from exc
+
+    return checked
 
 
 def _tree_to_record(tree: Tree, count: int, total: int) -> dict[str, object]:
@@ -33,17 +45,6 @@ def _tree_to_record(tree: Tree, count: int, total: int) -> dict[str, object]:
         "count": count,
         "prob": count / total if total else 0.0,
     }
-
-
-def _record_to_tree(record: dict[str, object], nodes: list[str]) -> Tree:
-    root = record["root"]  # type: ignore[index]
-    edges = record["edges"]  # type: ignore[index]
-    parent: dict[str, str | None] = {root: None}
-    for u, v in edges:  # type: ignore[misc]
-        parent[v] = u
-    for node in nodes:
-        parent.setdefault(node, None if node == root else root)
-    return Tree.from_parent_map(root, parent)
 
 
 def run_mwu(
@@ -61,8 +62,11 @@ def run_mwu(
     generator is a heuristic, and alpha is only an update scale.
     """
 
+    io.validate_graph(graph)
+    io.positive_count(iters, "iters")
+    io.positive_count(r, "candidates")
     rng = np.random.default_rng(seed)
-    nodes = list(graph.nodes)
+    nodes = sorted(graph.nodes)
     capacities = {io.edge_key(u, v): w for u, v, w in io.iter_edges(graph)}
     weights = {edge: 1.0 for edge in capacities}
     expected_scores = {edge: 0.0 for edge in capacities}
@@ -90,7 +94,7 @@ def run_mwu(
             weights[edge] *= math.exp(eta * (val / alpha - 1))
             expected_scores[edge] += val / iters
 
-        sig = _tree_signature(tree)
+        sig = mix_utils.tree_signature(tree)
         if sig not in mixture_counts:
             mixture_counts[sig] = {"tree": tree, "count": 0}
         mixture_counts[sig]["count"] = mixture_counts[sig]["count"] + 1  # type: ignore[index]
@@ -99,7 +103,10 @@ def run_mwu(
         _tree_to_record(info["tree"], info["count"], iters)  # type: ignore[index]
         for info in mixture_counts.values()
     ]
-    mixture.sort(key=lambda rec: rec["count"], reverse=True)  # type: ignore[index]
+    mixture.sort(
+        key=lambda rec: (-rec["count"], tuple(sorted(io.edge_key(*e) for e in rec["edges"])))
+    )
+    expected_scores, _ = mix_utils.summarize(graph, mixture, iters)
     return mixture, expected_scores
 
 
@@ -109,13 +116,14 @@ def write_json(path: Path, payload: dict) -> None:
 
 
 @app.command()
+@_input_errors
 def fit(
     graph: Annotated[
         Path,
         typer.Option(..., exists=True, help="Path to undirected weighted edge list"),
     ],
-    iters: Annotated[int, typer.Option(help="Number of MWU iterations")] = 80,
-    candidates: Annotated[int, typer.Option(help="Candidate trees per iteration")] = 8,
+    iters: Annotated[int, typer.Option(min=1, help="Number of MWU iterations")] = 80,
+    candidates: Annotated[int, typer.Option(min=1, help="Candidate trees per iteration")] = 8,
     seed: Annotated[int, typer.Option(help="Random seed")] = 0,
     out: Annotated[Path, typer.Option(help="Output directory")] = Path("outputs"),
 ) -> None:
@@ -134,6 +142,9 @@ def fit(
     )
 
     mixture_payload = {
+        "schema_version": mix_utils.SCHEMA_VERSION,
+        "metric": mix_utils.METRIC,
+        "graph_fingerprint": io.graph_fingerprint(g),
         "graph": graph.as_posix(),
         "iters": iters,
         "candidates": candidates,
@@ -143,10 +154,7 @@ def fit(
     }
     write_json(out / "mixture.json", mixture_payload)
 
-    all_cuts: list[dict[str, object]] = []
-    for rec in mixture:
-        tree = _record_to_tree(rec, list(g.nodes))
-        all_cuts.extend(cuts.extract_tree_cuts(g, tree))
+    expected_scores, all_cuts = mix_utils.summarize(g, mixture, iters)
 
     rpt = report.assemble_report(
         g,
@@ -160,6 +168,7 @@ def fit(
 
 
 @app.command("report")
+@_input_errors
 def report_cmd(
     graph: Annotated[Path, typer.Option(..., exists=True, help="Path to graph edge list")],
     mixture: Annotated[Path, typer.Option(..., exists=True, help="Path to mixture.json")],
@@ -169,20 +178,9 @@ def report_cmd(
 
     g = io.load_graph(graph)
     payload = json.loads(mixture.read_text())
+    mix_utils.validate_payload(g, payload)
     mixture_records = payload["trees"]
-    total_samples = sum(int(t["count"]) for t in mixture_records)
-
-    expected_scores = {io.edge_key(u, v): 0.0 for u, v, _ in io.iter_edges(g)}
-    all_cuts: list[dict[str, object]] = []
-    for rec in mixture_records:
-        tree = _record_to_tree(rec, list(g.nodes))
-        lca = LCA(tree)
-        c_t = metrics.compute_tree_capacities(g, tree, lca)
-        scores = metrics.compute_edge_scores(g, tree, lca, c_t)
-        weight = rec["count"] / total_samples  # type: ignore[index]
-        for edge, val in scores.items():
-            expected_scores[edge] += weight * val
-        all_cuts.extend(cuts.extract_tree_cuts(g, tree))
+    expected_scores, all_cuts = mix_utils.summarize(g, mixture_records, payload["iters"])
 
     rpt = report.assemble_report(
         g,

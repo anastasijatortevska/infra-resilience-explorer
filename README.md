@@ -33,8 +33,18 @@ ires report --graph data/tiny.edgelist --mixture outputs/mixture.json --out outp
 Edge list format
 ----------------
 Each line contains `u v w` (nodes are strings, `w` is a float capacity). Parallel edges are merged by summing capacities.
+The graph must be connected with at least two vertices, no self-loops, and
+finite positive capacities (including merged capacities). Invalid inputs and
+nonpositive iteration/candidate counts are rejected with an error.
 
 Outputs
 -------
 - `mixture.json`: the sampled trees and their probabilities.
 - `report.json`: maximum expected cut-path score, high-scoring edges, and low-capacity candidate cuts (node lists are truncated to 30 for readability).
+
+All tree cuts are globally ranked by absolute capacity. Equivalent partitions
+(including complements) are merged; ties use side size, node labels, and the
+inducing edge. Saved mixtures include a graph fingerprint and are validated
+for spanning-tree structure and consistent counts/probabilities. Both commands
+recompute the same expected scores. Old mixtures without the metric/schema
+metadata must be regenerated.

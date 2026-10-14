@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import networkx as nx
 
+from . import cuts as cut_utils
 from . import io
 
 
@@ -17,12 +18,12 @@ def scored_edges(
         key = io.edge_key(u, v)
         records.append(
             {
-                "edge": (u, v),
+                "edge": key,
                 "capacity": capacity,
                 "expected_cut_path_score": expected_scores[key],
             }
         )
-    records.sort(key=lambda r: r["expected_cut_path_score"], reverse=True)  # type: ignore[index]
+    records.sort(key=lambda r: (-r["expected_cut_path_score"], r["edge"]))
     return records[:top_k]
 
 
@@ -38,13 +39,14 @@ def assemble_report(
     """Build a summary report ready to serialize."""
 
     cut_entries: list[dict[str, object]] = []
-    for item in cuts[:top_k_cuts]:
+    for item in cut_utils.rank_cuts(graph, cuts, top_k_cuts):
         nodes = item["nodes"]  # type: ignore[index]
         cut_entries.append(
             {
                 "edge": item["edge"],
                 "capacity": item["capacity"],
                 "nodes": nodes[:30],
+                "side_size": len(nodes),
                 "truncated": len(nodes) > 30,
             }
         )
