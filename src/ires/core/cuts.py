@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import networkx as nx
 
 from . import io
@@ -11,10 +13,12 @@ from .tree import Tree
 def cut_capacity(graph: nx.Graph, subset: set[str]) -> float:
     """Exact capacity of the cut (subset, complement)."""
 
-    total = 0.0
-    for u, v, w in io.iter_edges(graph):
-        if (u in subset) != (v in subset):
-            total += w
+    try:
+        total = math.fsum(w for u, v, w in io.iter_edges(graph) if (u in subset) != (v in subset))
+    except OverflowError as exc:
+        raise ValueError("Cut capacity overflow; reduce capacity range") from exc
+    if not math.isfinite(total):
+        raise ValueError("Nonfinite cut capacity; reduce capacity range")
     return total
 
 

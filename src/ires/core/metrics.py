@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import networkx as nx
 
 from . import io
@@ -16,20 +18,29 @@ def compute_tree_capacities(graph: nx.Graph, tree: Tree, lca: LCA) -> dict[tuple
     this is the resulting load on each tree edge, before dividing by a capacity.
     """
 
-    add = {node: 0.0 for node in tree.nodes}
+    contributions = {node: [] for node in tree.nodes}
     for u, v, w in io.iter_edges(graph):
         ancestor = lca.lca(u, v)
-        add[u] += w
-        add[v] += w
-        add[ancestor] -= 2 * w
+        contributions[u].append(w)
+        contributions[v].append(w)
+        contributions[ancestor].extend((-w, -w))
 
-    total = dict(add)
+    # fsum limits rounding loss from signed endpoint/LCA contributions.
+    # Keep child totals in the same sum instead of rounding a local delta first.
     c_t: dict[tuple[str, str], float] = {}
     for node in reversed(tree.bfs_order):
         parent = tree.parent[node]
         if parent is not None:
-            total[parent] += total[node]
-            c_t[(parent, node)] = total[node]
+            try:
+                capacity = math.fsum(contributions[node])
+            except OverflowError as exc:
+                raise ValueError(f"Induced capacity overflow at {(parent, node)}") from exc
+            if not math.isfinite(capacity) or capacity <= 0:
+                raise ValueError(
+                    f"Invalid induced capacity at {(parent, node)}; reduce capacity range"
+                )
+            contributions[parent].append(capacity)
+            c_t[(parent, node)] = capacity
     return c_t
 
 
@@ -46,9 +57,11 @@ def compute_edge_scores(
     scores: dict[tuple[str, str], float] = {}
     for u, v, capacity in io.iter_edges(graph):
         key = io.edge_key(u, v)
-        if capacity <= 0:
-            scores[key] = float("inf")
-            continue
+        io.positive_finite(capacity, f"capacity of {key}")
         dist = lca.dist(u, v)
         scores[key] = dist / capacity
+        if not math.isfinite(scores[key]) or scores[key] <= 0:
+            raise ValueError(
+                f"Nonfinite or nonpositive cut-path score for {key}; reduce capacity range"
+            )
     return scores

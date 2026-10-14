@@ -89,6 +89,10 @@ def validate_payload(graph: nx.Graph, payload: dict) -> None:
         raise ValueError("Mixture graph fingerprint does not match node labels and capacities")
     io.positive_count(payload.get("iters"), "iters")
     io.positive_count(payload.get("candidates"), "candidates")
+    io.positive_finite(payload.get("alpha"), "alpha")
+    io.positive_finite(payload.get("eta", 0.6), "eta")
+    if type(payload.get("seed")) is not int or payload["seed"] < 0:
+        raise ValueError("seed must be a nonnegative integer")
     validate_records(graph, payload.get("trees"), payload["iters"])
 
 
@@ -108,4 +112,6 @@ def summarize(
             contributions[edge].append(record["count"] / total * score)
         candidates.extend(cuts.extract_tree_cuts(graph, tree))
     expected = {edge: math.fsum(values) for edge, values in contributions.items()}
+    if any(not math.isfinite(value) or value <= 0 for value in expected.values()):
+        raise ValueError("Nonfinite or nonpositive expected cut-path score")
     return expected, cuts.rank_cuts(graph, candidates)

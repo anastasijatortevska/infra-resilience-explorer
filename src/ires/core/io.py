@@ -88,6 +88,13 @@ def positive_count(value: int, name: str) -> None:
         raise ValueError(f"{name} must be a positive integer")
 
 
+def positive_finite(value: float, name: str) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{name} must be finite and positive")
+    if not math.isfinite(value) or value <= 0:
+        raise ValueError(f"{name} must be finite and positive")
+
+
 def edge_key(u: str, v: str) -> tuple[str, str]:
     """Return a canonical unordered edge key."""
 

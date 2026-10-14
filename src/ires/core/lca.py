@@ -41,6 +41,8 @@ class LCA:
                 raise ValueError(f"Node {node} missing parent")
             w = self.edge_weights.get((parent, node), 0.0)
             self.prefix[node] = self.prefix[parent] + w
+            if not math.isfinite(self.prefix[node]):
+                raise ValueError(f"Tree path-sum overflow at {node}; reduce capacity range")
 
     def lca(self, u: str, v: str) -> str:
         """Lowest common ancestor of two nodes."""
@@ -67,4 +69,4 @@ class LCA:
         """Path length using current edge weights."""
 
         ancestor = self.lca(u, v)
-        return self.prefix[u] + self.prefix[v] - 2 * self.prefix[ancestor]
+        return (self.prefix[u] - self.prefix[ancestor]) + (self.prefix[v] - self.prefix[ancestor])

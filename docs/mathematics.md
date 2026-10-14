@@ -56,3 +56,19 @@ are not independent in the normalized update. There is no approximation,
 convergence, or minimum-cut recovery guarantee for this candidate oracle.
 This is an experimental heuristic, not an implementation of a theorem-backed
 tree embedding or resilience algorithm.
+
+Numerically, weights are stored as logs. Each update adds
+(eta/alpha)*(s_T(e)-max_f s_T(f)), then subtracts the largest resulting log
+weight. Both subtractions remove only a common scale, preserving the normalized
+update and avoiding the old common exponential decay. A softmax gives q_t.
+Lengths are computed in logs and divided by their largest value: multiplying
+all lengths by the same positive constant preserves shortest paths.
+
+Capacity sums use `math.fsum`; tree distances subtract ancestor prefixes before
+adding the two sides. These reduce rounding and avoid unnecessary intermediate
+overflow, but are still double-precision calculations. Nonfinite scores/sums,
+nonpositive computed capacities, and unrepresentable relative weights/lengths
+are rejected. Extreme capacity ranges can still suffer cancellation; this is
+not an arbitrary-precision solver. Reproducibility means the same input,
+parameters, seed, and software environment; it is not a promise of identical
+ties across dependency versions or machines.
