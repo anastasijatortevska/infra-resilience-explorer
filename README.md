@@ -1,50 +1,153 @@
-Infra Resilience Explorer
-=========================
+# Infra Resilience Explorer
 
-This small Python experiment samples spanning-tree mixtures on undirected,
-capacitated graphs. It reports a heuristic **cut-path score** for original edges
-and the capacities of candidate fundamental cuts. These are not traffic
-congestion or validated infrastructure criticality measures.
+A small Python experiment on undirected graphs with positive capacities. It
+samples shortest-path spanning trees, uses multiplicative edge weights to
+choose a mixture, and reports a **cut-path score** and low-capacity candidate
+cuts. The name is historical: this is a synthetic graph-analysis experiment,
+with no real infrastructure validation or theoretical approximation guarantee.
 
-The exact definitions, a hand-checkable example, and the relationship to the
-iterative update are in [the mathematical contract](docs/mathematics.md).
-There is no approximation guarantee; the historical alpha formula is a tuning
-default, not a proven bound.
+## Quick start
 
-Quick start
------------
+Python 3.11+ is required. These commands were verified in a new virtual
+environment with Python 3.14.8; see [evaluation notes](docs/evaluation.md).
 
-1) Install dependencies (Python 3.11+):
-```
-pip install -e .[dev]
-```
-
-2) Fit on the provided tiny example:
-```
-ires fit --graph data/tiny.edgelist --iters 20 --candidates 4 --seed 0 --out outputs/
-```
-This writes `outputs/mixture.json` and `outputs/report.json`.
-
-3) Rebuild a report from a stored mixture:
-```
-ires report --graph data/tiny.edgelist --mixture outputs/mixture.json --out outputs/
+```sh
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
+ires fit --graph data/tiny.edgelist --iters 20 --candidates 4 --seed 0 --out outputs/fit
+ires report --graph data/tiny.edgelist --mixture outputs/fit/mixture.json --out outputs/rebuilt
+python -m pytest -q
+ruff check src tests scripts
 ```
 
-Edge list format
-----------------
-Each line contains `u v w` (nodes are strings, `w` is a float capacity). Parallel edges are merged by summing capacities.
-The graph must be connected with at least two vertices, no self-loops, and
-finite positive capacities (including merged capacities). Invalid inputs and
-nonpositive iteration/candidate counts are rejected with an error.
+Fit writes mixture.json and report.json. Report validates the saved mixture and
+rebuilds the same complete report, including floating-point values. The optional
+--alpha sets a positive update scale; eta is fixed at 0.6 in the CLI. Outputs
+record iterations, candidate count, seed, alpha and eta.
 
-Outputs
--------
-- `mixture.json`: the sampled trees and their probabilities.
-- `report.json`: maximum expected cut-path score, high-scoring edges, and low-capacity candidate cuts (node lists are truncated to 30 for readability).
+## Input and output example
 
-All tree cuts are globally ranked by absolute capacity. Equivalent partitions
-(including complements) are merged; ties use side size, node labels, and the
-inducing edge. Saved mixtures include a graph fingerprint and are validated
-for spanning-tree structure and consistent counts/probabilities. Both commands
-recompute the same expected scores. Old mixtures without the metric/schema
-metadata must be regenerated.
+Each line is `u v capacity`, with string node labels. Blank lines and lines
+starting with # are ignored. For example:
+
+```text
+a b 2
+b c 3
+```
+
+This path has one possible unrooted spanning tree. Its induced capacities are
+2 and 3, and both edge scores are 1. A fit reports these substantive fields:
+
+```json
+{
+  "metric": "cut_path_score",
+  "max_expected_cut_path_score": 1.0,
+  "scored_edges": [
+    {"edge": ["a", "b"], "capacity": 2.0, "expected_cut_path_score": 1.0},
+    {"edge": ["b", "c"], "capacity": 3.0, "expected_cut_path_score": 1.0}
+  ],
+  "candidate_cuts": [
+    {"edge": ["a", "b"], "capacity": 2.0, "nodes": ["a"], "side_size": 1, "truncated": false},
+    {"edge": ["b", "c"], "capacity": 3.0, "nodes": ["c"], "side_size": 1, "truncated": false}
+  ]
+}
+```
+
+This excerpt omits parameters and mixture records. Cut partitions use the
+smaller side; equal-size sides use sorted labels. Node lists are truncated to
+30 with full side size retained.
+
+Inputs must be connected with at least two vertices, no self-loops, and finite
+positive capacities. Parallel input edges are merged by capacity sum and the
+merged value is checked. Nonpositive iteration/candidate counts are rejected.
+Saved mixtures must cover every vertex with real tree edges and consistent
+positive counts/probabilities. A fingerprint binds the mixture to node labels
+and capacities. Old files without schema/metric metadata must be regenerated.
+
+## What the algorithm measures
+
+Remove tree edge f to obtain a partition. Its induced capacity C_T(f) is the
+sum of original capacities crossing that cut. For an original edge e=(u,v):
+
+```text
+s_T(e) = sum(C_T(f) for f on the u-v tree path) / capacity(e)
+expected_score(e) = sum(probability(T) * s_T(e) for T in the mixture)
+F = max(expected_score(e) for e in the original graph)
+```
+
+Lower F is the target. This **is not routing congestion**: for a unit triangle
+whose tree is a-b-c, the unused edge a-c has score 4, although it carries no
+routed demand. High-scoring edges have no established infrastructure-criticality
+interpretation.
+
+Each iteration normalizes weights q, sets lengths proportional to
+q(e)/capacity(e), samples roots, and generates shortest-path trees. It selects
+the candidate minimizing sum(q(e)*s_T(e)). The positive update raises attention
+on high-scoring edges. One selected tree per iteration forms an equally
+weighted sample mixture; repeated unrooted trees are aggregated by count.
+
+Weights use normalized logs and lengths receive a common rescaling. Invalid or
+unrepresentable intermediate values fail explicitly. Alpha's default
+10*log2(n+1) is a historical tuning choice with no proven bound. The candidate
+oracle does not generally minimize the weighted score over all spanning trees.
+See [the mathematical contract](docs/mathematics.md) for the derivation,
+reference examples and floating-point limitations.
+
+Cuts are a separate output: all selected trees' fundamental cuts are globally
+sorted by absolute capacity, complements are deduplicated, and ties use side
+size, labels, then inducing edge. Side size and volume do not normalize this
+score.
+
+## Reproducible evaluation
+
+```sh
+python scripts/evaluate.py --iters 80 --candidates 8 --seeds 0 1 2 --out evaluation/results.json
+```
+
+The deterministic eight-vertex families are a unit path, a unit cycle, and two
+four-vertex cliques with internal capacity 3 joined by two capacity-0.25 links.
+Baselines are a fixed SPT rooted at the first sorted label and an equal-weight
+mixture of 640 SPT samples with uniformly sampled roots. Static lengths are
+proportional to inverse capacity. Iteration also makes 640 SPT calls but selects
+80 trees and evaluates all 640 candidates' scores. SPT budgets match the sampled
+baseline; total computation differs.
+
+Mean maximum expected scores over seeds 0, 1 and 2 (lower is better):
+
+| Graph | Fixed SPT | Sampled SPT mixture | Iterative mixture |
+| --- | ---: | ---: | ---: |
+| Path | 1.0000 | 1.0000 | 1.0000 |
+| Cycle | 14.0000 | 4.8313 | 3.7500 |
+| Two clusters | 37.0000 | 37.0000 | 75.5125 |
+
+All methods recover a capacity-1 cut on the path and a capacity-2 cut on the
+cycle. On the cluster graph, both baselines' best candidate cut is 9, while
+iteration finds 0.5, the exact minimum. Iteration has **worse F** there:
+recovering a smaller cut is distinct from optimizing the cut-path score.
+There is no general improvement guarantee. The path correctly yields one
+unique tree for every method; diversity is not required.
+
+The saved run uses Python 3.14.8, NetworkX 3.7 and NumPy 2.5.4 on Linux x86_64.
+Full configuration, graph edges, mixtures, per-seed runtimes and budgets are in
+[results.json](evaluation/results.json). Dependency pins and detailed
+runtime/unique-tree results are in [evaluation notes](docs/evaluation.md).
+Identical software, input, parameters and seed reproduce substantive results;
+wall-clock timings vary. These small measurements are not a performance study.
+
+## Scope and limitations
+
+- Synthetic small graphs only; no claims about actual infrastructure resilience.
+- A heuristic score and restricted SPT candidates, with no approximation,
+  convergence, monotonic improvement or minimum-cut recovery guarantee.
+- Candidate cuts can miss the global minimum. The exact comparison checks
+  absolute minimum cut, not normalized sparsity or general resilience.
+- Double-precision arithmetic: log weighting removes common-scale failures,
+  but extreme relative weights/capacities can still be rejected or lose accuracy.
+- Deterministic ordering within a recorded environment; dependency versions can
+  change shortest-path ties. Cut extraction favors clarity over large-graph speed.
+
+Tests cover hand calculations, exhaustive four-node spanning trees, LCA/path
+references, input failures, saved-tree validation, global cut ranking, numerical
+stability and reproduction. [CI](.github/workflows/tests.yml) is configured to run
+tests and Ruff on Python 3.11 and 3.14.
