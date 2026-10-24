@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict, deque
+from collections.abc import Iterable
 
 
 class Tree:
@@ -11,6 +12,8 @@ class Tree:
     def __init__(self, root: str, parent: dict[str, str | None]):
         if root not in parent:
             raise ValueError("root must be present in parent map")
+        if parent[root] is not None:
+            raise ValueError(f"root {root!r} must have no parent")
         self.root = root
         self.parent = dict(parent)
 
@@ -74,6 +77,59 @@ class Tree:
             stack.extend(self.children.get(u, []))
         return out
 
+    def subtree_sizes(self) -> dict[str, int]:
+        """Return the subtree size of every node in one O(n) pass."""
+
+        sizes = dict.fromkeys(self.parent, 1)
+        for node in reversed(self._bfs_order):
+            par = self.parent[node]
+            if par is not None:
+                sizes[par] += sizes[node]
+        return sizes
+
     @classmethod
     def from_parent_map(cls, root: str, parents: dict[str, str | None]) -> Tree:
         return cls(root=root, parent=parents)
+
+    @classmethod
+    def from_edges(
+        cls, edges: Iterable[tuple[str, str]], root: str, nodes: Iterable[str] | None = None
+    ) -> Tree:
+        """Build a rooted tree from an undirected edge set.
+
+        Orients the edges by breadth-first search from ``root``. Raises ``ValueError``
+        unless the edges form a spanning tree of ``nodes`` (defaulting to the nodes
+        touched by ``edges``): no fabricated edges, no silently dropped component.
+        """
+
+        adjacency: dict[str, list[str]] = defaultdict(list)
+        edge_list = list(edges)
+        for u, v in edge_list:
+            adjacency[u].append(v)
+            adjacency[v].append(u)
+
+        expected = set(adjacency) if nodes is None else set(nodes)
+        if root not in expected:
+            raise ValueError(f"root {root!r} is not among the tree's nodes")
+        extra = set(adjacency) - expected
+        if extra:
+            raise ValueError(f"edges touch nodes outside the graph: {sorted(extra)[:5]}")
+        if len(edge_list) != len(expected) - 1:
+            raise ValueError(
+                f"expected {len(expected) - 1} edges for a spanning tree on "
+                f"{len(expected)} nodes, got {len(edge_list)}"
+            )
+
+        parent: dict[str, str | None] = {root: None}
+        queue: deque[str] = deque([root])
+        while queue:
+            u = queue.popleft()
+            for v in adjacency[u]:
+                if v not in parent:
+                    parent[v] = u
+                    queue.append(v)
+
+        unreached = expected - set(parent)
+        if unreached:
+            raise ValueError(f"edges do not span the graph; unreached: {sorted(unreached)[:5]}")
+        return cls(root=root, parent=parent)

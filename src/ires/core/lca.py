@@ -51,17 +51,24 @@ class LCA:
         diff = self.tree.depth[u] - self.tree.depth[v]
         for k in range(self.max_log + 1):
             if diff & (1 << k):
-                u = self.up[k][u]  # type: ignore[index]
-                if u is None:
-                    break
+                lifted = self.up[k][u]
+                if lifted is None:
+                    raise ValueError(f"depth of {u!r} exceeds its ancestor chain")
+                u = lifted
         if u == v:
             return u
 
+        # Descend together while the ancestors differ. At equal depth both lookups are
+        # None or both are nodes, so a mismatch guarantees two real ancestors.
         for k in reversed(range(self.max_log + 1)):
-            if self.up[k][u] != self.up[k][v]:
-                u = self.up[k][u]  # type: ignore[index]
-                v = self.up[k][v]  # type: ignore[index]
-        return self.tree.parent[u]  # type: ignore[return-value]
+            up_u, up_v = self.up[k][u], self.up[k][v]
+            if up_u != up_v:
+                assert up_u is not None and up_v is not None
+                u, v = up_u, up_v
+        parent = self.tree.parent[u]
+        if parent is None:
+            raise ValueError(f"{u!r} and {v!r} have no common ancestor")
+        return parent
 
     def dist(self, u: str, v: str) -> float:
         """Path length using current edge weights."""
