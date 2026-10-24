@@ -20,15 +20,16 @@ import networkx as nx
 
 from ires.core import io
 from ires.core.lca import LCA
-from ires.core.mixture import TreeRecord, evaluate_mixture
+from ires.core.mixture import TreeRecord, evaluate_mixture, records_to_dicts
 from ires.core.mwu import MwuParams, run_mwu
+from ires.core.tree import Tree
 from ires.oracles import ORACLES
 
 
 def average_stretch(graph: nx.Graph, record: TreeRecord, lengths: dict[io.Edge, float]) -> float:
     """Mean ratio of tree path length to direct edge length, under ``lengths``."""
 
-    tree = record.to_tree(graph)
+    tree = Tree.from_edges(record.edges, record.root, graph.nodes)
     lca = LCA(tree)
     lca.set_edge_weights({(p, c): lengths[io.edge_key(p, c)] for p, c in tree.edges()})
     ratios = [lca.dist(u, v) / lengths[io.edge_key(u, v)] for u, v, _ in io.iter_edges(graph)]
@@ -46,7 +47,10 @@ def main() -> None:
     graph = io.load_graph(args.graph)
     lengths = {edge: 1.0 / capacity for edge, capacity in io.capacities(graph).items()}
     print(f"{args.graph}: {graph.number_of_nodes()} nodes, {graph.number_of_edges()} edges")
-    header = f"{'oracle':8s} {'lower':>9s} {'alpha_hat':>10s} {'gap':>7s} {'trees':>6s} {'stretch':>8s} {'sec':>6s}"
+    header = (
+        f"{'oracle':8s} {'floor':>9s} {'achieved':>10s} {'gap':>7s} "
+        f"{'trees':>6s} {'stretch':>8s} {'sec':>6s}"
+    )
     print(header)
     print("-" * len(header))
 
@@ -57,12 +61,14 @@ def main() -> None:
         started = time.perf_counter()
         result = run_mwu(graph, params)
         elapsed = time.perf_counter() - started
-        evaluation = evaluate_mixture(graph, result.records)
+        records = records_to_dicts(result.records, args.iters)
+        evaluation = evaluate_mixture(graph, records, args.iters)
 
         stretch = min(average_stretch(graph, record, lengths) for record in result.records)
-        gap = evaluation.alpha_hat / result.certified_lower if result.certified_lower else 0.0
+        achieved = evaluation.max_expected_score
+        gap = achieved / result.dual_estimate if result.dual_estimate else 0.0
         print(
-            f"{name:8s} {result.certified_lower:9.4f} {evaluation.alpha_hat:10.4f} "
+            f"{name:8s} {result.certified_lower:9.4f} {achieved:10.4f} "
             f"{gap:6.1f}x {len(result.records):6d} {stretch:8.2f} {elapsed:6.2f}"
         )
 

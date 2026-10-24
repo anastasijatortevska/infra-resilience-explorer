@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections import defaultdict, deque
 from collections.abc import Iterable
 
+import networkx as nx
+
 
 class Tree:
     """Represents a rooted tree with parent/child relationships."""
@@ -13,9 +15,14 @@ class Tree:
         if root not in parent:
             raise ValueError("root must be present in parent map")
         if parent[root] is not None:
-            raise ValueError(f"root {root!r} must have no parent")
+            raise ValueError("root must have no parent")
+        for node, par in parent.items():
+            if not isinstance(node, str):
+                raise ValueError("Tree node identifiers must be strings")
+            if node != root and (par not in parent or par == node):
+                raise ValueError(f"Node {node} must have a different parent in the tree")
         self.root = root
-        self.parent = dict(parent)
+        self.parent = dict(sorted(parent.items()))
 
         self.children: dict[str, list[str]] = defaultdict(list)
         for node, par in self.parent.items():
@@ -36,6 +43,15 @@ class Tree:
         missing_depth = [n for n in self.parent if n not in self.depth]
         if missing_depth:
             raise ValueError(f"Parent map does not form a connected tree: {missing_depth}")
+
+    def validate_against(self, graph: nx.Graph) -> None:
+        """Require exact coverage and real graph edges for a spanning tree."""
+
+        if set(self.nodes) != set(graph.nodes):
+            raise ValueError("Tree nodes must exactly cover the graph")
+        for edge in self.edges():
+            if not graph.has_edge(*edge):
+                raise ValueError(f"Tree edge {edge} is not an edge of the graph")
 
     @property
     def nodes(self) -> list[str]:
@@ -95,11 +111,13 @@ class Tree:
     def from_edges(
         cls, edges: Iterable[tuple[str, str]], root: str, nodes: Iterable[str] | None = None
     ) -> Tree:
-        """Build a rooted tree from an undirected edge set.
+        """Build a rooted tree from an undirected edge set, orienting it by BFS.
 
-        Orients the edges by breadth-first search from ``root``. Raises ``ValueError``
-        unless the edges form a spanning tree of ``nodes`` (defaulting to the nodes
-        touched by ``edges``): no fabricated edges, no silently dropped component.
+        For oracles, which produce an unoriented spanning tree. Raises ``ValueError``
+        unless the edges form a spanning tree of ``nodes`` (defaulting to the nodes the
+        edges touch): no fabricated edges, no silently dropped component. Deserializing
+        a saved tree uses :func:`ires.core.mixture.record_to_tree` instead, which keeps
+        the stored orientation and checks the edges against the graph.
         """
 
         adjacency: dict[str, list[str]] = defaultdict(list)
@@ -116,8 +134,8 @@ class Tree:
             raise ValueError(f"edges touch nodes outside the graph: {sorted(extra)[:5]}")
         if len(edge_list) != len(expected) - 1:
             raise ValueError(
-                f"expected {len(expected) - 1} edges for a spanning tree on "
-                f"{len(expected)} nodes, got {len(edge_list)}"
+                f"edges do not form a connected spanning tree: expected "
+                f"{len(expected) - 1} edges on {len(expected)} nodes, got {len(edge_list)}"
             )
 
         parent: dict[str, str | None] = {root: None}
@@ -131,5 +149,7 @@ class Tree:
 
         unreached = expected - set(parent)
         if unreached:
-            raise ValueError(f"edges do not span the graph; unreached: {sorted(unreached)[:5]}")
+            raise ValueError(
+                f"edges do not form a connected spanning tree; unreached: {sorted(unreached)[:5]}"
+            )
         return cls(root=root, parent=parent)

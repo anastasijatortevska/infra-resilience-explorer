@@ -43,7 +43,7 @@ def _decompose(
 ) -> tuple[dict[str, str], list[tuple[str, str]]]:
     """Cluster ``graph`` by random shifts; return (node -> cluster centre, forest edges)."""
 
-    shift = {node: scale * float(rng.exponential()) for node in graph.nodes}
+    shift = {node: scale * float(rng.exponential()) for node in sorted(graph.nodes)}
     latest = max(shift.values())
 
     heap: list[tuple[float, str, str, str | None]] = [
@@ -72,7 +72,10 @@ def _contract(graph: nx.Graph, centre: Mapping[str, str]) -> nx.Graph:
     """Collapse each cluster to its centre, keeping the shortest crossing edge."""
 
     contracted = nx.Graph()
-    contracted.add_nodes_from(set(centre.values()))
+    # Sorted, not set order: node insertion order decides heap ties in the next
+    # level, and set iteration over strings varies with PYTHONHASHSEED, which would
+    # make the whole run irreproducible across processes.
+    contracted.add_nodes_from(sorted(set(centre.values())))
     for u, v, data in graph.edges(data=True):
         cu, cv = centre[u], centre[v]
         if cu == cv:
@@ -96,7 +99,8 @@ def low_diameter_spanning_tree(
         current.add_edge(u, v, **{LENGTH_KEY: length, ORIGIN_KEY: (u, v)})
 
     if current.number_of_nodes() == 1:
-        return Tree(root=str(next(iter(graph.nodes))), parent={str(next(iter(graph.nodes))): None})
+        root = min(graph.nodes)
+        return Tree(root=root, parent={root: None})
 
     scale = _mean_length(current)
 
@@ -116,5 +120,4 @@ def low_diameter_spanning_tree(
         # stretch in scripts/compare_oracles.py.
         scale = 2.0 * _mean_length(current)
 
-    root = str(next(iter(current.nodes)))
-    return Tree.from_edges(chosen, root=root, nodes=graph.nodes)
+    return Tree.from_edges(chosen, root=min(current.nodes), nodes=graph.nodes)

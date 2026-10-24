@@ -1,8 +1,9 @@
 """Tree oracles for the MWU loop.
 
 An oracle takes the graph, the current per-edge lengths and a random generator, and
-returns a spanning tree. The MWU loop asks for several candidates per iteration and
-keeps the one with the lowest average congestion under the current length function.
+returns a spanning tree. The loop asks for several candidates per iteration and keeps
+the one with the lowest weighted cut-path score. None of them solves that objective;
+they are candidate generators, as ``docs/mathematics.md`` sets out.
 """
 
 from __future__ import annotations
@@ -17,7 +18,7 @@ from ..core.io import Edge
 from ..core.tree import Tree
 from .mpx import low_diameter_spanning_tree
 from .mst import minimum_spanning_tree
-from .spt import shortest_path_tree, shortest_path_tree_from
+from .spt import random_root_spt, shortest_path_tree
 
 
 class Oracle(Protocol):
@@ -27,7 +28,7 @@ class Oracle(Protocol):
 
 
 ORACLES: dict[str, Oracle] = {
-    "spt": shortest_path_tree,
+    "spt": random_root_spt,
     "mst": minimum_spanning_tree,
     "ldd": low_diameter_spanning_tree,
 }
@@ -51,6 +52,6 @@ __all__ = [
     "get_oracle",
     "low_diameter_spanning_tree",
     "minimum_spanning_tree",
+    "random_root_spt",
     "shortest_path_tree",
-    "shortest_path_tree_from",
 ]

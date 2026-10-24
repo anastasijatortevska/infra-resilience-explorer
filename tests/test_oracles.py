@@ -1,23 +1,21 @@
 from __future__ import annotations
 
+import os
 import statistics
+import subprocess
+import sys
+import textwrap
+from pathlib import Path
 
 import networkx as nx
 import numpy as np
 import pytest
-from conftest import random_capacitated_graph
+from conftest import random_capacitated_graph, resistance_lengths, unit_grid
 
 from ires.core import io
 from ires.core.lca import LCA
 from ires.core.tree import Tree
 from ires.oracles import DEFAULT_ORACLE, ORACLES, get_oracle
-
-
-def unit_grid(side: int) -> nx.Graph:
-    graph = nx.relabel_nodes(nx.grid_2d_graph(side, side), lambda rc: f"r{rc[0]}c{rc[1]}")
-    for u, v in graph.edges:
-        graph[u][v][io.CAPACITY_KEY] = 1.0
-    return graph
 
 
 def average_stretch(graph: nx.Graph, tree: Tree, lengths: dict[io.Edge, float]) -> float:
@@ -33,7 +31,7 @@ def average_stretch(graph: nx.Graph, tree: Tree, lengths: dict[io.Edge, float]) 
 @pytest.mark.parametrize("oracle", sorted(ORACLES))
 def test_every_oracle_returns_a_spanning_tree(oracle: str) -> None:
     graph = random_capacitated_graph(120, seed=8, spread=3.0)
-    lengths = {edge: 1.0 / capacity for edge, capacity in io.capacities(graph).items()}
+    lengths = resistance_lengths(graph)
     rng = np.random.default_rng(0)
     build = ORACLES[oracle]
     for _ in range(10):
@@ -66,7 +64,7 @@ def test_decomposition_oracle_has_lower_stretch_than_the_baseline() -> None:
     """
 
     graph = unit_grid(15)
-    lengths = {edge: 1.0 / capacity for edge, capacity in io.capacities(graph).items()}
+    lengths = resistance_lengths(graph)
 
     def mean_stretch(name: str) -> float:
         rng = np.random.default_rng(0)
@@ -80,8 +78,45 @@ def test_decomposition_oracle_has_lower_stretch_than_the_baseline() -> None:
 
 def test_stretch_is_finite_on_heavy_tailed_capacities() -> None:
     graph = random_capacitated_graph(80, seed=3, spread=4.0)
-    lengths = {edge: 1.0 / capacity for edge, capacity in io.capacities(graph).items()}
+    lengths = resistance_lengths(graph)
     rng = np.random.default_rng(0)
     for name in sorted(ORACLES):
         value = average_stretch(graph, ORACLES[name](graph, lengths, rng), lengths)
         assert value > 0 and value == value
+
+
+@pytest.mark.parametrize("oracle", sorted(ORACLES))
+def test_oracles_are_reproducible_across_processes(oracle: str) -> None:
+    """Same seed, same result, whatever PYTHONHASHSEED is.
+
+    Iterating a set of node labels varies with the per-process string hash seed, so
+    a run that does it is reproducible within one process and not between them. Only
+    a subprocess with a different seed catches that.
+    """
+
+    program = textwrap.dedent(
+        f"""
+        from conftest import unit_grid
+        from ires.core import io
+        from ires.oracles import ORACLES
+        import numpy as np
+
+        graph = unit_grid(8)
+        lengths = {{e: 1.0 for e in io.capacities(graph)}}
+        rng = np.random.default_rng(0)
+        trees = [ORACLES[{oracle!r}](graph, lengths, rng) for _ in range(3)]
+        print(sorted(io.edge_key(u, v) for tree in trees for u, v in tree.edges()))
+        """
+    )
+    env = {**os.environ, "PYTHONPATH": str(Path(__file__).parent)}
+    outputs = {
+        subprocess.run(  # noqa: S603
+            [sys.executable, "-c", program],
+            capture_output=True,
+            text=True,
+            check=True,
+            env={**env, "PYTHONHASHSEED": seed},
+        ).stdout
+        for seed in ("0", "1", "2")
+    }
+    assert len(outputs) == 1, f"{oracle} depends on PYTHONHASHSEED"

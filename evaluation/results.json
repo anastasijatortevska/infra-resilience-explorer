@@ -1,0 +1,4092 @@
+{
+  "schema_version": 1,
+  "metric": "cut_path_score",
+  "configuration": {
+    "iters": 80,
+    "candidates": 8,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "alpha_override": null,
+    "eta": 0.6,
+    "default_alpha": "10 * log2(n + 1)",
+    "static_lengths": "proportional to 1 / capacity"
+  },
+  "environment": {
+    "python": "3.14.8",
+    "platform": "Linux-7.2.11-arch1-1-x86_64-with-glibc2.44",
+    "machine": "x86_64",
+    "packages": {
+      "networkx": "3.6.1",
+      "numpy": "2.4.1",
+      "typer": "0.21.1",
+      "rich": "14.3.1",
+      "pytest": "9.0.2",
+      "ruff": "0.14.14"
+    }
+  },
+  "graphs": {
+    "path": {
+      "nodes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "edges": [
+        [
+          "0",
+          "1",
+          1.0
+        ],
+        [
+          "1",
+          "2",
+          1.0
+        ],
+        [
+          "2",
+          "3",
+          1.0
+        ],
+        [
+          "3",
+          "4",
+          1.0
+        ],
+        [
+          "4",
+          "5",
+          1.0
+        ],
+        [
+          "5",
+          "6",
+          1.0
+        ],
+        [
+          "6",
+          "7",
+          1.0
+        ]
+      ],
+      "fingerprint": "6f39852adc858c47272e4877a217c08d94c0e3c9f04d2117f8bc705e956a6a60",
+      "exact_global_min_cut_capacity": 1.0
+    },
+    "cycle": {
+      "nodes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "edges": [
+        [
+          "0",
+          "1",
+          1.0
+        ],
+        [
+          "0",
+          "7",
+          1.0
+        ],
+        [
+          "1",
+          "2",
+          1.0
+        ],
+        [
+          "2",
+          "3",
+          1.0
+        ],
+        [
+          "3",
+          "4",
+          1.0
+        ],
+        [
+          "4",
+          "5",
+          1.0
+        ],
+        [
+          "5",
+          "6",
+          1.0
+        ],
+        [
+          "6",
+          "7",
+          1.0
+        ]
+      ],
+      "fingerprint": "7f7a3528295a51c37819f0fdae27496616c5faa6557c6ba5717e17346cb57d00",
+      "exact_global_min_cut_capacity": 2.0
+    },
+    "clusters": {
+      "nodes": [
+        "a0",
+        "a1",
+        "a2",
+        "a3",
+        "b0",
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "edges": [
+        [
+          "a0",
+          "a1",
+          3.0
+        ],
+        [
+          "a0",
+          "a2",
+          3.0
+        ],
+        [
+          "a0",
+          "a3",
+          3.0
+        ],
+        [
+          "a0",
+          "b0",
+          0.25
+        ],
+        [
+          "a1",
+          "a2",
+          3.0
+        ],
+        [
+          "a1",
+          "a3",
+          3.0
+        ],
+        [
+          "a1",
+          "b1",
+          0.25
+        ],
+        [
+          "a2",
+          "a3",
+          3.0
+        ],
+        [
+          "b0",
+          "b1",
+          3.0
+        ],
+        [
+          "b0",
+          "b2",
+          3.0
+        ],
+        [
+          "b0",
+          "b3",
+          3.0
+        ],
+        [
+          "b1",
+          "b2",
+          3.0
+        ],
+        [
+          "b1",
+          "b3",
+          3.0
+        ],
+        [
+          "b2",
+          "b3",
+          3.0
+        ]
+      ],
+      "fingerprint": "3e25dc5e0401ae51b47ceaac95f04f34eba4e7705ef2085e934c4b430f0fee5c",
+      "exact_global_min_cut_capacity": 0.5
+    }
+  },
+  "runs": [
+    {
+      "family": "path",
+      "seed": 0,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.005188857001485303,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "path",
+      "seed": 0,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.024277090997202322,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "6",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 640,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "path",
+      "seed": 0,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.07512881200091215,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "6",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 80,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "path",
+      "seed": 1,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.00045012199552729726,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "path",
+      "seed": 1,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.02336163599829888,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "3",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 640,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "path",
+      "seed": 1,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.07470687399472808,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "3",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 80,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "path",
+      "seed": 2,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.00042272800055798143,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "path",
+      "seed": 2,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.02300129400100559,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "6",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 640,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "path",
+      "seed": 2,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 1.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.06793952499720035,
+      "best_candidate_cut_capacity": 1.0,
+      "exact_global_min_cut_capacity": 1.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "6",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 80,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 0,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 14.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.0005460669999592938,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 0,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 4.68125,
+      "unique_trees": 7,
+      "runtime_seconds": 0.031314252999436576,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 14
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 143,
+          "prob": 0.2234375
+        },
+        {
+          "root": "7",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ]
+          ],
+          "count": 93,
+          "prob": 0.1453125
+        },
+        {
+          "root": "6",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 87,
+          "prob": 0.1359375
+        },
+        {
+          "root": "4",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 84,
+          "prob": 0.13125
+        },
+        {
+          "root": "5",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 82,
+          "prob": 0.128125
+        },
+        {
+          "root": "3",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 77,
+          "prob": 0.1203125
+        },
+        {
+          "root": "2",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 74,
+          "prob": 0.115625
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 0,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 3.8000000000000003,
+      "unique_trees": 8,
+      "runtime_seconds": 0.07498093799949856,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 16
+      },
+      "trees": [
+        {
+          "root": "6",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 12,
+          "prob": 0.15
+        },
+        {
+          "root": "1",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "1",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "7",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "4",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "5",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "2",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 2,
+          "prob": 0.025
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 1,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 14.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.0006013510064803995,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 1,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 4.8125,
+      "unique_trees": 7,
+      "runtime_seconds": 0.03165881400491344,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 14
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 150,
+          "prob": 0.234375
+        },
+        {
+          "root": "6",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 91,
+          "prob": 0.1421875
+        },
+        {
+          "root": "3",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 88,
+          "prob": 0.1375
+        },
+        {
+          "root": "7",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ]
+          ],
+          "count": 82,
+          "prob": 0.128125
+        },
+        {
+          "root": "2",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 79,
+          "prob": 0.1234375
+        },
+        {
+          "root": "4",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 77,
+          "prob": 0.1203125
+        },
+        {
+          "root": "5",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 73,
+          "prob": 0.1140625
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 1,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 3.8000000000000003,
+      "unique_trees": 7,
+      "runtime_seconds": 0.08130620000156341,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 14
+      },
+      "trees": [
+        {
+          "root": "3",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 12,
+          "prob": 0.15
+        },
+        {
+          "root": "7",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ]
+          ],
+          "count": 12,
+          "prob": 0.15
+        },
+        {
+          "root": "4",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 12,
+          "prob": 0.15
+        },
+        {
+          "root": "1",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "1",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "6",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "5",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 2,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 14.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.0004415399962454103,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 2,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 5.0,
+      "unique_trees": 7,
+      "runtime_seconds": 0.030817489001492504,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 14
+      },
+      "trees": [
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 160,
+          "prob": 0.25
+        },
+        {
+          "root": "3",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 87,
+          "prob": 0.1359375
+        },
+        {
+          "root": "7",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ]
+          ],
+          "count": 82,
+          "prob": 0.128125
+        },
+        {
+          "root": "4",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 82,
+          "prob": 0.128125
+        },
+        {
+          "root": "2",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 78,
+          "prob": 0.121875
+        },
+        {
+          "root": "6",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 76,
+          "prob": 0.11875
+        },
+        {
+          "root": "5",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 75,
+          "prob": 0.1171875
+        }
+      ]
+    },
+    {
+      "family": "cycle",
+      "seed": 2,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 3.6500000000000004,
+      "unique_trees": 8,
+      "runtime_seconds": 0.07289361499715596,
+      "best_candidate_cut_capacity": 2.0,
+      "exact_global_min_cut_capacity": 2.0,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 16
+      },
+      "trees": [
+        {
+          "root": "7",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "2",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 10,
+          "prob": 0.125
+        },
+        {
+          "root": "1",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 10,
+          "prob": 0.125
+        },
+        {
+          "root": "0",
+          "edges": [
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "3",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ],
+            [
+              "0",
+              "7"
+            ]
+          ],
+          "count": 10,
+          "prob": 0.125
+        },
+        {
+          "root": "7",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "1",
+              "2"
+            ],
+            [
+              "2",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "7",
+              "6"
+            ]
+          ],
+          "count": 10,
+          "prob": 0.125
+        },
+        {
+          "root": "4",
+          "edges": [
+            [
+              "1",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "4",
+              "5"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 10,
+          "prob": 0.125
+        },
+        {
+          "root": "5",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "5",
+              "6"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 10,
+          "prob": 0.125
+        },
+        {
+          "root": "6",
+          "edges": [
+            [
+              "7",
+              "0"
+            ],
+            [
+              "0",
+              "1"
+            ],
+            [
+              "3",
+              "2"
+            ],
+            [
+              "4",
+              "3"
+            ],
+            [
+              "5",
+              "4"
+            ],
+            [
+              "6",
+              "5"
+            ],
+            [
+              "6",
+              "7"
+            ]
+          ],
+          "count": 9,
+          "prob": 0.1125
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 0,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 37.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.0010425979999126866,
+      "best_candidate_cut_capacity": 9.0,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 8.5,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 0,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 37.0,
+      "unique_trees": 8,
+      "runtime_seconds": 0.03591742000571685,
+      "best_candidate_cut_capacity": 9.0,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 8.5,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 16
+      },
+      "trees": [
+        {
+          "root": "b3",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b3",
+              "b0"
+            ],
+            [
+              "b3",
+              "b1"
+            ],
+            [
+              "b3",
+              "b2"
+            ]
+          ],
+          "count": 93,
+          "prob": 0.1453125
+        },
+        {
+          "root": "b2",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b2",
+              "b0"
+            ],
+            [
+              "b2",
+              "b1"
+            ],
+            [
+              "b2",
+              "b3"
+            ]
+          ],
+          "count": 87,
+          "prob": 0.1359375
+        },
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 84,
+          "prob": 0.13125
+        },
+        {
+          "root": "b0",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b0",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 84,
+          "prob": 0.13125
+        },
+        {
+          "root": "b1",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 82,
+          "prob": 0.128125
+        },
+        {
+          "root": "a3",
+          "edges": [
+            [
+              "a3",
+              "a0"
+            ],
+            [
+              "a3",
+              "a1"
+            ],
+            [
+              "a3",
+              "a2"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 77,
+          "prob": 0.1203125
+        },
+        {
+          "root": "a2",
+          "edges": [
+            [
+              "a2",
+              "a0"
+            ],
+            [
+              "a2",
+              "a1"
+            ],
+            [
+              "a2",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 74,
+          "prob": 0.115625
+        },
+        {
+          "root": "a1",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 59,
+          "prob": 0.0921875
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 0,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 75.5125,
+      "unique_trees": 4,
+      "runtime_seconds": 0.10362297899700934,
+      "best_candidate_cut_capacity": 0.5,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 8
+      },
+      "trees": [
+        {
+          "root": "a1",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 58,
+          "prob": 0.725
+        },
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 12,
+          "prob": 0.15
+        },
+        {
+          "root": "b0",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b0",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 9,
+          "prob": 0.1125
+        },
+        {
+          "root": "b1",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 1,
+          "prob": 0.0125
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 1,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 37.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.0007901810022303835,
+      "best_candidate_cut_capacity": 9.0,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 8.5,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 1,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 37.0,
+      "unique_trees": 8,
+      "runtime_seconds": 0.029677097998501267,
+      "best_candidate_cut_capacity": 9.0,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 8.5,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 16
+      },
+      "trees": [
+        {
+          "root": "b2",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b2",
+              "b0"
+            ],
+            [
+              "b2",
+              "b1"
+            ],
+            [
+              "b2",
+              "b3"
+            ]
+          ],
+          "count": 91,
+          "prob": 0.1421875
+        },
+        {
+          "root": "a3",
+          "edges": [
+            [
+              "a3",
+              "a0"
+            ],
+            [
+              "a3",
+              "a1"
+            ],
+            [
+              "a3",
+              "a2"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 88,
+          "prob": 0.1375
+        },
+        {
+          "root": "b3",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b3",
+              "b0"
+            ],
+            [
+              "b3",
+              "b1"
+            ],
+            [
+              "b3",
+              "b2"
+            ]
+          ],
+          "count": 82,
+          "prob": 0.128125
+        },
+        {
+          "root": "a2",
+          "edges": [
+            [
+              "a2",
+              "a0"
+            ],
+            [
+              "a2",
+              "a1"
+            ],
+            [
+              "a2",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 79,
+          "prob": 0.1234375
+        },
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 77,
+          "prob": 0.1203125
+        },
+        {
+          "root": "b0",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b0",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 77,
+          "prob": 0.1203125
+        },
+        {
+          "root": "a1",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 73,
+          "prob": 0.1140625
+        },
+        {
+          "root": "b1",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 73,
+          "prob": 0.1140625
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 1,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 75.5125,
+      "unique_trees": 4,
+      "runtime_seconds": 0.10477376899507362,
+      "best_candidate_cut_capacity": 0.5,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 8
+      },
+      "trees": [
+        {
+          "root": "a1",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 58,
+          "prob": 0.725
+        },
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 11,
+          "prob": 0.1375
+        },
+        {
+          "root": "b0",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b0",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 10,
+          "prob": 0.125
+        },
+        {
+          "root": "b0",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b0",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 1,
+          "prob": 0.0125
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 2,
+      "method": "fixed_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 37.0,
+      "unique_trees": 1,
+      "runtime_seconds": 0.0005546550019062124,
+      "best_candidate_cut_capacity": 9.0,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 8.5,
+      "budget": {
+        "shortest_path_trees": 1,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 1,
+        "summary_tree_score_evaluations": 2
+      },
+      "trees": [
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 1,
+          "prob": 1.0
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 2,
+      "method": "uniform_spt",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 37.0,
+      "unique_trees": 8,
+      "runtime_seconds": 0.029748435998044442,
+      "best_candidate_cut_capacity": 9.0,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 8.5,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 0,
+        "selected_tree_samples": 640,
+        "summary_tree_score_evaluations": 16
+      },
+      "trees": [
+        {
+          "root": "a3",
+          "edges": [
+            [
+              "a3",
+              "a0"
+            ],
+            [
+              "a3",
+              "a1"
+            ],
+            [
+              "a3",
+              "a2"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 87,
+          "prob": 0.1359375
+        },
+        {
+          "root": "b0",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b0",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 82,
+          "prob": 0.128125
+        },
+        {
+          "root": "b3",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b3",
+              "b0"
+            ],
+            [
+              "b3",
+              "b1"
+            ],
+            [
+              "b3",
+              "b2"
+            ]
+          ],
+          "count": 82,
+          "prob": 0.128125
+        },
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 81,
+          "prob": 0.1265625
+        },
+        {
+          "root": "a1",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 79,
+          "prob": 0.1234375
+        },
+        {
+          "root": "a2",
+          "edges": [
+            [
+              "a2",
+              "a0"
+            ],
+            [
+              "a2",
+              "a1"
+            ],
+            [
+              "a2",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 78,
+          "prob": 0.121875
+        },
+        {
+          "root": "b2",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b2",
+              "b0"
+            ],
+            [
+              "b2",
+              "b1"
+            ],
+            [
+              "b2",
+              "b3"
+            ]
+          ],
+          "count": 76,
+          "prob": 0.11875
+        },
+        {
+          "root": "b1",
+          "edges": [
+            [
+              "b0",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 75,
+          "prob": 0.1171875
+        }
+      ]
+    },
+    {
+      "family": "clusters",
+      "seed": 2,
+      "method": "iterative",
+      "alpha": 31.69925001442312,
+      "max_expected_cut_path_score": 75.5125,
+      "unique_trees": 4,
+      "runtime_seconds": 0.11145758799830219,
+      "best_candidate_cut_capacity": 0.5,
+      "exact_global_min_cut_capacity": 0.5,
+      "candidate_cut_gap": 0.0,
+      "budget": {
+        "shortest_path_trees": 640,
+        "selection_score_evaluations": 640,
+        "selected_tree_samples": 80,
+        "summary_tree_score_evaluations": 8
+      },
+      "trees": [
+        {
+          "root": "b1",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 50,
+          "prob": 0.625
+        },
+        {
+          "root": "b0",
+          "edges": [
+            [
+              "a1",
+              "a0"
+            ],
+            [
+              "b1",
+              "a1"
+            ],
+            [
+              "a1",
+              "a2"
+            ],
+            [
+              "a1",
+              "a3"
+            ],
+            [
+              "b0",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 15,
+          "prob": 0.1875
+        },
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "b1",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b1",
+              "b2"
+            ],
+            [
+              "b1",
+              "b3"
+            ]
+          ],
+          "count": 14,
+          "prob": 0.175
+        },
+        {
+          "root": "a0",
+          "edges": [
+            [
+              "a0",
+              "a1"
+            ],
+            [
+              "a0",
+              "a2"
+            ],
+            [
+              "a0",
+              "a3"
+            ],
+            [
+              "a0",
+              "b0"
+            ],
+            [
+              "a1",
+              "b1"
+            ],
+            [
+              "b0",
+              "b2"
+            ],
+            [
+              "b0",
+              "b3"
+            ]
+          ],
+          "count": 1,
+          "prob": 0.0125
+        }
+      ]
+    }
+  ]
+}

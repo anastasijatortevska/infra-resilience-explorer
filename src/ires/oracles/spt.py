@@ -1,9 +1,7 @@
-"""Shortest-path tree oracle: the baseline to compare other oracles against.
+"""Shortest-path tree oracle, the baseline candidate generator.
 
-A shortest-path tree from a random root is cheap but carries no approximation
-guarantee for minimum average congestion, so the MWU bound it produces is a
-heuristic rather than a certificate. See :mod:`ires.oracles.mpx` for a
-low-diameter-decomposition alternative.
+Shortest paths do not solve the weighted tree-score objective in general, so this
+carries no approximation guarantee; see ``docs/mathematics.md``.
 """
 
 from __future__ import annotations
@@ -18,21 +16,15 @@ from ..core.io import Edge, edge_key
 from ..core.tree import Tree
 
 
-def shortest_path_tree(
-    graph: nx.Graph, lengths: Mapping[Edge, float], rng: np.random.Generator
-) -> Tree:
-    """Shortest-path tree from a uniformly random root under ``lengths``.
+def shortest_path_tree(graph: nx.Graph, lengths: Mapping[Edge, float], root: str) -> Tree:
+    """Shortest-path tree from ``root`` under ``lengths``.
 
-    ``lengths`` must cover every edge; a missing entry raises ``KeyError`` rather
-    than falling back to a default, which would silently return a wrong tree.
+    ``lengths`` must cover every edge; a missing entry raises ``KeyError`` rather than
+    falling back to a default, which would silently return a tree for other lengths.
     """
 
-    root = str(rng.choice(sorted(graph.nodes)))
-    return shortest_path_tree_from(graph, lengths, root)
-
-
-def shortest_path_tree_from(graph: nx.Graph, lengths: Mapping[Edge, float], root: str) -> Tree:
-    """Shortest-path tree from an explicit ``root``."""
+    if root not in graph:
+        raise ValueError(f"root {root!r} is not a vertex of the graph")
 
     def weight(u: str, v: str, _data: Any) -> float:
         return lengths[edge_key(u, v)]
@@ -46,3 +38,11 @@ def shortest_path_tree_from(graph: nx.Graph, lengths: Mapping[Edge, float], root
             raise ValueError(f"node {node!r} unreachable from {root!r}")
         edges.append((plist[0], node))
     return Tree.from_edges(edges, root=root, nodes=graph.nodes)
+
+
+def random_root_spt(
+    graph: nx.Graph, lengths: Mapping[Edge, float], rng: np.random.Generator
+) -> Tree:
+    """Shortest-path tree from a uniformly random root."""
+
+    return shortest_path_tree(graph, lengths, str(rng.choice(sorted(graph.nodes))))

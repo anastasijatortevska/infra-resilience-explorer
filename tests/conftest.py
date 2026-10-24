@@ -9,6 +9,7 @@ import pytest
 from ires.core import io
 
 DATA = Path(__file__).resolve().parent.parent / "data"
+TINY = str(DATA / "tiny.edgelist")
 
 
 @pytest.fixture
@@ -30,20 +31,26 @@ def random_capacitated_graph(
     graph = graph.subgraph(max(nx.connected_components(graph), key=len)).copy()
     graph = nx.relabel_nodes(graph, lambda i: f"n{i:04d}")
     rng = np.random.default_rng(seed)
-    for u, v in graph.edges:
+    for u, v in sorted(graph.edges):
         graph[u][v][io.CAPACITY_KEY] = float(np.exp(rng.normal(0.0, spread)))
     return graph
 
 
 def cycle_graph(nodes: int) -> nx.Graph:
-    graph = nx.cycle_graph(nodes)
-    graph = nx.relabel_nodes(graph, lambda i: f"v{i:03d}")
-    for u, v in graph.edges:
-        graph[u][v][io.CAPACITY_KEY] = 1.0
+    graph = nx.relabel_nodes(nx.cycle_graph(nodes), lambda i: f"v{i:03d}")
+    nx.set_edge_attributes(graph, 1.0, io.CAPACITY_KEY)
     return graph
 
 
-def brute_force_cut_capacity(graph: nx.Graph, subset: set[str]) -> float:
-    """Reference implementation: scan every edge. O(m) per cut, used only in tests."""
+def unit_grid(side: int) -> nx.Graph:
+    graph = nx.relabel_nodes(nx.grid_2d_graph(side, side), lambda rc: f"r{rc[0]}c{rc[1]}")
+    nx.set_edge_attributes(graph, 1.0, io.CAPACITY_KEY)
+    return graph
 
-    return sum(w for u, v, w in io.iter_edges(graph) if (u in subset) != (v in subset))
+
+def unit_lengths(graph: nx.Graph) -> dict[io.Edge, float]:
+    return dict.fromkeys(io.capacities(graph), 1.0)
+
+
+def resistance_lengths(graph: nx.Graph) -> dict[io.Edge, float]:
+    return {edge: 1.0 / capacity for edge, capacity in io.capacities(graph).items()}
